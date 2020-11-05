@@ -1,22 +1,30 @@
 const request = require('request');
 
-let args = process.argv.slice(2);
-let name = args[0];
-let url = 'https://api.tecatapi.com/v1/breeds/search?q=' + name;
 
-request.get(url,(error,response
-,body)=>{
-  if(error){
-    console.log(error);
+
+const fetchBreedDescription = function(breedName,callback) {
+
+  let url = 'https://api.thecatapi.com/v1/breeds/search?q=' + breedName;
+
+ 
+  request(url,(error,response
+    ,body)=>{
+      
+    if (!error) {
+    const data = JSON.parse(body);
+    // console.log(data)
+    const name = data[0];
+    if(!name){
+      callback(`Breed ${breedName} not found.`, null)
+    }else{
+      callback(null,name.description)
     }
-    else{
-  let data = JSON.parse(body);
-//console.log(data)
-if (data.length === 0){
-  console.log(' Breed not found')
+  }else{
+    callback(error,null)
+  }
   
-}else{
-console.log(data[0].description);
-}
-    } 
-})
+  });
+};
+
+module.exports = {fetchBreedDescription};
+// if !error then data and name if !data callback error breed els callback with desc else callback network error  
